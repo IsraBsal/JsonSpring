@@ -1,9 +1,13 @@
 package mx.com.gm.service;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.lang.reflect.Array;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,27 +54,38 @@ public class PersonaServiceImpl implements PersonaService {
 		String content = stringBuilder.toString();
 		// convert to json array
 		JSONArray json = new JSONArray(content);
-		
-		//Convertimos el objeto
+
+		// Convertimos el objeto
 		Persona personaResponse = new Persona();
 		personaResponse.setApellido(persona.getApellido());
 		personaResponse.setEmail(persona.getEmail());
 		personaResponse.setNombre(persona.getNombre());
-		Long id = (long) json.length()+1;
+		Long id = (long) json.length() + 1;
 		System.out.println(id);
 		personaResponse.setIdPersona(id);
 		Gson gson = new Gson();
-	    String personaJson = gson.toJson(personaResponse);
-	    JSONObject personaJson2 = new JSONObject(personaJson);
+		String personaJson = gson.toJson(personaResponse);
+		JSONObject personaJson2 = new JSONObject(personaJson);
 		System.out.println(personaJson2);
 		json.put(personaJson2);
-		
-		System.out.println("Json del servicio: "+json);
-		
-		//Escribimos el nuevo objeto sobre el archivo Json 
-		///////
-		
-		
+
+		System.out.println("Json del servicio: " + json);
+
+		// Escribimos el nuevo objeto sobre el archivo Json
+
+		try {
+			String test = json.toString();
+			File file = new File(ruta);
+
+			FileWriter fw = new FileWriter(file.getAbsoluteFile());
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(test);
+			bw.close();
+
+			System.out.println("Done");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 		return persona;
 	}
 
@@ -95,15 +110,31 @@ public class PersonaServiceImpl implements PersonaService {
 		String content = stringBuilder.toString();
 		// convert to json array
 		JSONArray json = new JSONArray(content);
-		
+
 		json.remove(idPersona);
 		System.out.println(json.get(idPersona));
 		System.out.println(idPersona);
 		System.out.println(json);
-		return true;
 		
-		//Sobreescribir el archivo JSON
-		/////////
+		
+		// Sobreescribir el archivo JSON
+		try {
+			String test = json.toString();
+			File file = new File(ruta);
+
+			FileWriter fw = new FileWriter(file.getAbsoluteFile());
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(test);
+			bw.close();
+
+			System.out.println("Done");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return true;
+
+		
+
 
 	}
 
