@@ -18,6 +18,4 @@ public interface PersonaService {
 	
 	public Boolean eliminar (int idPersona) throws FileNotFoundException, IOException, JSONException;
 	
-	public Persona encontrarPersona(Persona persona);
-	
 }

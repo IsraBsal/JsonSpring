@@ -17,7 +17,7 @@ public class Persona implements Serializable{
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idPersona;
+    private int idPersona;
     
     @NotEmpty //Para trabajar con cadenas ya que valida que la cadena no sea vacia en cambio notnull si acepta cadenas vacias
     private String nombre;

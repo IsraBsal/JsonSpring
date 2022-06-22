@@ -54,22 +54,17 @@ public class PersonaServiceImpl implements PersonaService {
 		String content = stringBuilder.toString();
 		// convert to json array
 		JSONArray json = new JSONArray(content);
-
-		// Convertimos el objeto
-		Persona personaResponse = new Persona();
-		personaResponse.setApellido(persona.getApellido());
-		personaResponse.setEmail(persona.getEmail());
-		personaResponse.setNombre(persona.getNombre());
-		Long id = (long) json.length() + 1;
-		System.out.println(id);
-		personaResponse.setIdPersona(id);
+		
+		 
+		// Seteamos el ID para que sea autoincrementable
+		int id = (int) (json.getJSONObject(json.length()-1).opt("idPersona"))+1; //Obteniendo el id del ultimo elemento con .opt
+		persona.setIdPersona(id); //Se asigna Id 
+		
+		//Pequeña transformacion de un objeto java a Gson y por ultimo a JSONObject 
 		Gson gson = new Gson();
-		String personaJson = gson.toJson(personaResponse);
+		String personaJson = gson.toJson(persona);
 		JSONObject personaJson2 = new JSONObject(personaJson);
-		System.out.println(personaJson2);
-		json.put(personaJson2);
-
-		System.out.println("Json del servicio: " + json);
+		json.put(personaJson2); //Se añade el nuevo objeto al array de jsons
 
 		// Escribimos el nuevo objeto sobre el archivo Json
 
@@ -82,10 +77,12 @@ public class PersonaServiceImpl implements PersonaService {
 			bw.write(test);
 			bw.close();
 
-			System.out.println("Done");
+			System.out.println("D	one");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		//Regresamos el objeto persona para la respuesta en el controlador
 		return persona;
 	}
 
@@ -140,13 +137,6 @@ public class PersonaServiceImpl implements PersonaService {
 
 	@Override
 	@Transactional(readOnly = true)
-	public Persona encontrarPersona(Persona persona) {
-
-		return personaDao.findById(persona.getIdPersona()).orElse(null);
-	}
-
-	@Override
-	@Transactional(readOnly = true)
 	public JSONArray listaPersonas1() throws IOException, JSONException {
 		// TODO Auto-generated method stub
 		String ruta = "\\Users\\Default.DESKTOP-SMFCBP8\\Desktop\\employees.json";
@@ -177,5 +167,7 @@ public class PersonaServiceImpl implements PersonaService {
 		return json;
 
 	}
+
+	
 
 }

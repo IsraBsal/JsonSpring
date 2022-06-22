@@ -47,18 +47,17 @@ public class ControladorInicio {
 	}
 
 	@RequestMapping(value = "/create", method = RequestMethod.POST)	
-	public @ResponseBody ResponseEntity<Persona> guardar(@RequestBody @Valid Persona persona) throws FileNotFoundException, IOException, JSONException {
-		//System.out.println("Como me llega en el controlador:"+ persona.toString());
+	public @ResponseBody ResponseEntity<Persona> guardar(@RequestBody Persona persona) throws FileNotFoundException, IOException, JSONException {
 		Persona response = personaService.guardar(persona);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
 	}
 
-	@PutMapping("/editar/{idPersona}")
-	public void editar(Persona persona, Model model) {
-		persona = personaService.encontrarPersona(persona);
-
-	}
+//	@PutMapping("/editar/{idPersona}")
+//	public void editar(Persona persona, Model model) {
+//		persona = personaService.encontrarPersona(persona);
+//
+//	}
 
 	@DeleteMapping("/eliminar/{idPersona}")
 	public @ResponseBody ResponseEntity<?> eliminar(@PathVariable("idPersona") @Valid int idPersona) throws FileNotFoundException, IOException, JSONException {
