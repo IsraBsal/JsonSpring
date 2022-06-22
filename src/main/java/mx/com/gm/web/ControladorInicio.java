@@ -41,7 +41,6 @@ public class ControladorInicio {
 	@RequestMapping(value = "/Users", method = RequestMethod.GET)
 	public  @ResponseBody ResponseEntity<String> inicio() throws FileNotFoundException, IOException, JSONException {
 		JSONArray array = personaService.listaPersonas1();
-		log.info("ejecutando el controlador Spring MVC");
 		return new ResponseEntity<String>(array.toString(), HttpStatus.OK);
 
 	}
@@ -62,7 +61,12 @@ public class ControladorInicio {
 	@DeleteMapping("/eliminar/{idPersona}")
 	public @ResponseBody ResponseEntity<?> eliminar(@PathVariable("idPersona") @Valid int idPersona) throws FileNotFoundException, IOException, JSONException {
 		Boolean respuesta = personaService.eliminar(idPersona);
-		return ResponseEntity.status(HttpStatus.OK).body("Persona Eliminada");
+		if (respuesta) {
+			return ResponseEntity.status(HttpStatus.OK).body("Persona Eliminada");
+		}else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Persona no encontrada");
+		}
+		
 
 	}
 

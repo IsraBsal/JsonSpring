@@ -54,17 +54,17 @@ public class PersonaServiceImpl implements PersonaService {
 		String content = stringBuilder.toString();
 		// convert to json array
 		JSONArray json = new JSONArray(content);
-		
-		 
+
 		// Seteamos el ID para que sea autoincrementable
-		int id = (int) (json.getJSONObject(json.length()-1).opt("idPersona"))+1; //Obteniendo el id del ultimo elemento con .opt
-		persona.setIdPersona(id); //Se asigna Id 
-		
-		//Pequeña transformacion de un objeto java a Gson y por ultimo a JSONObject 
+		int id = (int) (json.getJSONObject(json.length() - 1).opt("idPersona")) + 1; // Obteniendo el id del ultimo
+																						// elemento con .opt
+		persona.setIdPersona(id); // Se asigna Id
+
+		// Pequeña transformacion de un objeto java a Gson y por ultimo a JSONObject
 		Gson gson = new Gson();
 		String personaJson = gson.toJson(persona);
 		JSONObject personaJson2 = new JSONObject(personaJson);
-		json.put(personaJson2); //Se añade el nuevo objeto al array de jsons
+		json.put(personaJson2); // Se añade el nuevo objeto al array de jsons
 
 		// Escribimos el nuevo objeto sobre el archivo Json
 
@@ -76,13 +76,11 @@ public class PersonaServiceImpl implements PersonaService {
 			BufferedWriter bw = new BufferedWriter(fw);
 			bw.write(test);
 			bw.close();
-
-			System.out.println("D	one");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
-		//Regresamos el objeto persona para la respuesta en el controlador
+
+		// Regresamos el objeto persona para la respuesta en el controlador
 		return persona;
 	}
 
@@ -90,7 +88,7 @@ public class PersonaServiceImpl implements PersonaService {
 	@Transactional
 	public Boolean eliminar(int idPersona) throws IOException, JSONException {
 		String ruta = "\\Users\\Default.DESKTOP-SMFCBP8\\Desktop\\employees.json";
-
+		Boolean bandera = false;
 		// Leemos el archivo en un string
 		BufferedReader reader = new BufferedReader(new FileReader(ruta));
 		StringBuilder stringBuilder = new StringBuilder();
@@ -108,30 +106,31 @@ public class PersonaServiceImpl implements PersonaService {
 		// convert to json array
 		JSONArray json = new JSONArray(content);
 
-		json.remove(idPersona);
-		System.out.println(json.get(idPersona));
-		System.out.println(idPersona);
-		System.out.println(json);
-		
-		
-		// Sobreescribir el archivo JSON
-		try {
-			String test = json.toString();
-			File file = new File(ruta);
+		// Buscamos el ID de la persona a eliminar
 
-			FileWriter fw = new FileWriter(file.getAbsoluteFile());
-			BufferedWriter bw = new BufferedWriter(fw);
-			bw.write(test);
-			bw.close();
+		for (int i = 0; i < json.length(); i++) {
+			if (idPersona == (int) json.getJSONObject(i).opt("idPersona")) {
+				json.remove(i);
+				bandera = true;
 
-			System.out.println("Done");
-		} catch (IOException e) {
-			e.printStackTrace();
+				// Sobreescribir el archivo JSON
+				try {
+					String test = json.toString();
+					File file = new File(ruta);
+
+					FileWriter fw = new FileWriter(file.getAbsoluteFile());
+					BufferedWriter bw = new BufferedWriter(fw);
+					bw.write(test);
+					bw.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+			} else {
+				bandera = false;
+			}
 		}
-		return true;
-
-		
-
+		return bandera;
 
 	}
 
@@ -158,16 +157,8 @@ public class PersonaServiceImpl implements PersonaService {
 		// convert to json array
 		JSONArray json = new JSONArray(content);
 
-		for (int i = 0; i < json.length(); i++) {
-			JSONObject obj = json.getJSONObject(i);
-			// do something
-			System.out.println(obj);
-		}
-
 		return json;
 
 	}
-
-	
 
 }
