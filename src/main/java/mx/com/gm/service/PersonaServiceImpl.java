@@ -189,7 +189,8 @@ public class PersonaServiceImpl implements PersonaService {
 	public Persona update(Persona persona, int idPersona) throws IOException, JSONException {
 		String ruta = "\\Users\\Default.DESKTOP-SMFCBP8\\Desktop\\employees.json";
 		int posicion = -1;
-
+		String content;
+		
 		System.out.println("Objeto " + persona);
 		// Creamos el objeto persona de java para convertirlo a JSON
 		Persona personaJson = new Persona();
@@ -211,10 +212,17 @@ public class PersonaServiceImpl implements PersonaService {
 			stringBuilder.append(ls);
 		}
 		// delete the last new line separator
-		stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-		reader.close();
+		// Comprobar el archivo vacio
+		System.out.println(stringBuilder.length());
+		if (stringBuilder.length() - 1 <= 0) {
+			reader.close();
+			content = "[]";
+		} else {
+			stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+			reader.close();
+			content = stringBuilder.toString();
 
-		String content = stringBuilder.toString();
+		}
 		// convert to json array
 		JSONArray json = new JSONArray(content);
 		// Buscamos a la persona por ID
