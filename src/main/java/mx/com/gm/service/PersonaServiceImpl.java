@@ -161,4 +161,92 @@ public class PersonaServiceImpl implements PersonaService {
 
 	}
 
+	@Override
+	@Transactional
+	public Persona update(Persona persona, int idPersona) throws IOException, JSONException {
+		String ruta = "\\Users\\Default.DESKTOP-SMFCBP8\\Desktop\\employees.json";
+		int posicion = -1;
+
+		System.out.println("Objeto " + persona);
+		// Creamos el objeto persona de java para convertirlo a JSON
+		Persona personaJson = new Persona();
+		personaJson.setIdPersona(idPersona);
+		personaJson.setNombre(persona.getNombre());
+		personaJson.setEmail(persona.getEmail());
+		personaJson.setApellido(persona.getApellido());
+		personaJson.setTelefono(persona.getTelefono());
+
+		System.out.println(personaJson);
+
+		// Leemos el archivo en un string
+		BufferedReader reader = new BufferedReader(new FileReader(ruta));
+		StringBuilder stringBuilder = new StringBuilder();
+		String line = null;
+		String ls = System.getProperty("line.separator");
+		while ((line = reader.readLine()) != null) {
+			stringBuilder.append(line);
+			stringBuilder.append(ls);
+		}
+		// delete the last new line separator
+		stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+		reader.close();
+
+		String content = stringBuilder.toString();
+		// convert to json array
+		JSONArray json = new JSONArray(content);
+		// Buscamos a la persona por ID
+		for (int i = 0; i < json.length(); i++) {
+			if (idPersona == (int) json.getJSONObject(i).opt("idPersona")) {
+				posicion = i;
+				JSONObject gson = new JSONObject(personaJson);
+				json.put(i, gson);
+				// Sobreescribimos el nuevo file JSON y terminamos
+				try {
+					String test = json.toString();
+					File file = new File(ruta);
+
+					FileWriter fw = new FileWriter(file.getAbsoluteFile());
+					BufferedWriter bw = new BufferedWriter(fw);
+					bw.write(test);
+					bw.close();
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
+
+				return personaJson;
+
+			} else {
+				posicion = i;
+
+			}
+
+		}
+
+		// Condicion para saber si recorrimos todo el arreglo de los usuarios y no
+		// encontramos coincidencia
+		// Eso indica que es un objeto nuevo a insertar
+		if ((posicion < json.length())) {
+			System.out.println("nuevo Objeto");
+			JSONObject gson = new JSONObject(personaJson);
+			json.put(gson);
+			System.out.println(json);
+			// Sobreescribimos el nuevo file JSON y terminamos
+			try {
+				String test = json.toString();
+				File file = new File(ruta);
+
+				FileWriter fw = new FileWriter(file.getAbsoluteFile());
+				BufferedWriter bw = new BufferedWriter(fw);
+				bw.write(test);
+				bw.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+
+			return personaJson;
+		}
+
+		return personaJson;
+	}
+
 }

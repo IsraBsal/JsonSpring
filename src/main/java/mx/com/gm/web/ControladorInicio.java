@@ -7,6 +7,7 @@ import mx.com.gm.service.PersonaService;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Array;
+import java.util.Objects;
 
 import javax.validation.Valid;
 
@@ -39,34 +40,40 @@ public class ControladorInicio {
 	private PersonaService personaService;
 
 	@RequestMapping(value = "/Users", method = RequestMethod.GET)
-	public  @ResponseBody ResponseEntity<String> inicio() throws FileNotFoundException, IOException, JSONException {
+	public @ResponseBody ResponseEntity<String> inicio() throws FileNotFoundException, IOException, JSONException {
 		JSONArray array = personaService.listaPersonas1();
 		return new ResponseEntity<String>(array.toString(), HttpStatus.OK);
 
 	}
 
-	@RequestMapping(value = "/create", method = RequestMethod.POST)	
-	public @ResponseBody ResponseEntity<Persona> guardar(@RequestBody Persona persona) throws FileNotFoundException, IOException, JSONException {
+	@RequestMapping(value = "/create", method = RequestMethod.POST)
+	public @ResponseBody ResponseEntity<Persona> guardar(@RequestBody Persona persona)
+			throws FileNotFoundException, IOException, JSONException {
 		Persona response = personaService.guardar(persona);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 
 	}
 
-//	@PutMapping("/editar/{idPersona}")
-//	public void editar(Persona persona, Model model) {
-//		persona = personaService.encontrarPersona(persona);
-//
-//	}
+	@RequestMapping("/editar/{idPersona}")
+	public @ResponseBody ResponseEntity<?> editar(@RequestBody Persona persona, @PathVariable int idPersona)
+			throws IOException, JSONException {
+		persona = personaService.update(persona, idPersona);
+		if (Objects.isNull(persona)) {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Persona no encontrada");
+		} else {
+			return ResponseEntity.status(HttpStatus.CREATED).body(persona);
+		}
+	}
 
 	@DeleteMapping("/eliminar/{idPersona}")
-	public @ResponseBody ResponseEntity<?> eliminar(@PathVariable("idPersona") @Valid int idPersona) throws FileNotFoundException, IOException, JSONException {
+	public @ResponseBody ResponseEntity<?> eliminar(@PathVariable("idPersona") @Valid int idPersona)
+			throws FileNotFoundException, IOException, JSONException {
 		Boolean respuesta = personaService.eliminar(idPersona);
 		if (respuesta) {
 			return ResponseEntity.status(HttpStatus.OK).body("Persona Eliminada");
-		}else {
+		} else {
 			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Persona no encontrada");
 		}
-		
 
 	}
 
