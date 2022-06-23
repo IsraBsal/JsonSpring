@@ -154,7 +154,8 @@ public class PersonaServiceImpl implements PersonaService {
 	public JSONArray listaPersonas1() throws IOException, JSONException {
 		// TODO Auto-generated method stub
 		String ruta = "\\Users\\Default.DESKTOP-SMFCBP8\\Desktop\\employees.json";
-
+		String content;
+		
 		// Leemos el archivo en un string
 		BufferedReader reader = new BufferedReader(new FileReader(ruta));
 		StringBuilder stringBuilder = new StringBuilder();
@@ -165,10 +166,17 @@ public class PersonaServiceImpl implements PersonaService {
 			stringBuilder.append(ls);
 		}
 		// delete the last new line separator
-		stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-		reader.close();
+		// Comprobar el archivo vacio
+		System.out.println(stringBuilder.length());
+		if (stringBuilder.length() - 1 <= 0) {
+			reader.close();
+			content = "[]";
+		} else {
+			stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+			reader.close();
+			content = stringBuilder.toString();
 
-		String content = stringBuilder.toString();
+		}
 		// convert to json array
 		JSONArray json = new JSONArray(content);
 
