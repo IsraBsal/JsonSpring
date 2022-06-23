@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.databind.jsontype.impl.AsWrapperTypeDeserializer;
 import com.google.gson.Gson;
 
 import org.json.JSONObject;
@@ -32,38 +33,16 @@ public class PersonaServiceImpl implements PersonaService {
 	@Autowired
 	private PersonaDao personaDao;
 
+	private String ruta = "\\Users\\Default.DESKTOP-SMFCBP8\\Desktop\\employees.json";
+	
+
 	@Override
 	@Transactional
 	public Persona guardar(Persona persona) throws IOException, JSONException {
 
-		String ruta = "\\Users\\Default.DESKTOP-SMFCBP8\\Desktop\\employees.json";
-		String content;
 		int id = 0;
+		JSONArray json = read();
 
-		// Leemos el archivo en un string
-		BufferedReader reader = new BufferedReader(new FileReader(ruta));
-		StringBuilder stringBuilder = new StringBuilder();
-		String line = null;
-		String ls = System.getProperty("line.separator");
-		while ((line = reader.readLine()) != null) {
-			stringBuilder.append(line);
-			stringBuilder.append(ls);
-		}
-		// delete the last new line separator
-		// Comprobar el archivo vacio
-		System.out.println(stringBuilder.length());
-		if (stringBuilder.length() - 1 <= 0) {
-			reader.close();
-			content = "[]";
-		} else {
-			stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-			reader.close();
-			content = stringBuilder.toString();
-
-		}
-
-		// convert to json array
-		JSONArray json = new JSONArray(content);
 		if (json.length() == 0) { // No hay ningun elemento en la lista
 			id = 0;
 		} else {
@@ -81,17 +60,7 @@ public class PersonaServiceImpl implements PersonaService {
 
 		// Escribimos el nuevo objeto sobre el archivo Json
 
-		try {
-			String test = json.toString();
-			File file = new File(ruta);
-
-			FileWriter fw = new FileWriter(file.getAbsoluteFile());
-			BufferedWriter bw = new BufferedWriter(fw);
-			bw.write(test);
-			bw.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		write(json);
 
 		// Regresamos el objeto persona para la respuesta en el controlador
 		return persona;
@@ -100,33 +69,9 @@ public class PersonaServiceImpl implements PersonaService {
 	@Override
 	@Transactional
 	public Boolean eliminar(int idPersona) throws IOException, JSONException {
-		String ruta = "\\Users\\Default.DESKTOP-SMFCBP8\\Desktop\\employees.json";
 		Boolean bandera = false;
-		String content;
 
-		// Leemos el archivo en un string
-		BufferedReader reader = new BufferedReader(new FileReader(ruta));
-		StringBuilder stringBuilder = new StringBuilder();
-		String line = null;
-		String ls = System.getProperty("line.separator");
-		while ((line = reader.readLine()) != null) {
-			stringBuilder.append(line);
-			stringBuilder.append(ls);
-		}
-		// delete the last new line separator
-		// Comprobar el archivo vacio
-		System.out.println(stringBuilder.length());
-		if (stringBuilder.length() - 1 <= 0) {
-			reader.close();
-			content = "[]";
-		} else {
-			stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-			reader.close();
-			content = stringBuilder.toString();
-
-		}
-		// convert to json array
-		JSONArray json = new JSONArray(content);
+		JSONArray json = read();
 
 		// Buscamos el ID de la persona a eliminar
 
@@ -134,19 +79,8 @@ public class PersonaServiceImpl implements PersonaService {
 			if (idPersona == (int) json.getJSONObject(i).opt("idPersona")) {
 				json.remove(i);
 				bandera = true;
-
-				// Sobreescribir el archivo JSON
-				try {
-					String test = json.toString();
-					File file = new File(ruta);
-
-					FileWriter fw = new FileWriter(file.getAbsoluteFile());
-					BufferedWriter bw = new BufferedWriter(fw);
-					bw.write(test);
-					bw.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+				// Sobreescribir el archivo JSON y terminamos
+				write(json);
 				return bandera;
 
 			} else {
@@ -161,43 +95,15 @@ public class PersonaServiceImpl implements PersonaService {
 	@Transactional(readOnly = true)
 	public JSONArray listaPersonas1() throws IOException, JSONException {
 		// TODO Auto-generated method stub
-		String ruta = "\\Users\\Default.DESKTOP-SMFCBP8\\Desktop\\employees.json";
-		String content;
-
-		// Leemos el archivo en un string
-		BufferedReader reader = new BufferedReader(new FileReader(ruta));
-		StringBuilder stringBuilder = new StringBuilder();
-		String line = null;
-		String ls = System.getProperty("line.separator");
-		while ((line = reader.readLine()) != null) {
-			stringBuilder.append(line);
-			stringBuilder.append(ls);
-		}
-		// delete the last new line separator
-		// Comprobar el archivo vacio
-		System.out.println(stringBuilder.length());
-		if (stringBuilder.length() - 1 <= 0) {
-			reader.close();
-			content = "[]";
-		} else {
-			stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-			reader.close();
-			content = stringBuilder.toString();
-
-		}
-		// convert to json array
-		JSONArray json = new JSONArray(content);
-
-		return json;
+		return read();
 
 	}
 
 	@Override
 	@Transactional
 	public Persona update(Persona persona, int idPersona) throws IOException, JSONException {
-		String ruta = "\\Users\\Default.DESKTOP-SMFCBP8\\Desktop\\employees.json";
 		int posicion = -1;
-		String content;
+		
 
 		System.out.println("Objeto " + persona);
 		// Creamos el objeto persona de java para convertirlo a JSON
@@ -209,30 +115,8 @@ public class PersonaServiceImpl implements PersonaService {
 		personaJson.setTelefono(persona.getTelefono());
 
 		System.out.println(personaJson);
-
-		// Leemos el archivo en un string
-		BufferedReader reader = new BufferedReader(new FileReader(ruta));
-		StringBuilder stringBuilder = new StringBuilder();
-		String line = null;
-		String ls = System.getProperty("line.separator");
-		while ((line = reader.readLine()) != null) {
-			stringBuilder.append(line);
-			stringBuilder.append(ls);
-		}
-		// delete the last new line separator
-		// Comprobar el archivo vacio
-		System.out.println(stringBuilder.length());
-		if (stringBuilder.length() - 1 <= 0) {
-			reader.close();
-			content = "[]";
-		} else {
-			stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-			reader.close();
-			content = stringBuilder.toString();
-
-		}
-		// convert to json array
-		JSONArray json = new JSONArray(content);
+		//Lectura y conversion del archivo a JSONArray
+		JSONArray json = read();
 		// Buscamos a la persona por ID
 		for (int i = 0; i < json.length(); i++) {
 			if (idPersona == (int) json.getJSONObject(i).opt("idPersona")) {
@@ -240,18 +124,7 @@ public class PersonaServiceImpl implements PersonaService {
 				JSONObject gson = new JSONObject(personaJson);
 				json.put(i, gson);
 				// Sobreescribimos el nuevo file JSON y terminamos
-				try {
-					String test = json.toString();
-					File file = new File(ruta);
-
-					FileWriter fw = new FileWriter(file.getAbsoluteFile());
-					BufferedWriter bw = new BufferedWriter(fw);
-					bw.write(test);
-					bw.close();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-
+				write(json);
 				return personaJson;
 
 			} else {
@@ -270,22 +143,53 @@ public class PersonaServiceImpl implements PersonaService {
 			json.put(gson);
 			System.out.println(json);
 			// Sobreescribimos el nuevo file JSON y terminamos
-			try {
-				String test = json.toString();
-				File file = new File(ruta);
-
-				FileWriter fw = new FileWriter(file.getAbsoluteFile());
-				BufferedWriter bw = new BufferedWriter(fw);
-				bw.write(test);
-				bw.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
+			write(json);
 			return personaJson;
 		}
 
 		return personaJson;
+	}
+
+	public JSONArray read() throws IOException, JSONException {
+		String content;
+		// Leemos el archivo en un string
+		BufferedReader reader = new BufferedReader(new FileReader(ruta));
+		StringBuilder stringBuilder = new StringBuilder();
+		String line = null;
+		String ls = System.getProperty("line.separator");
+		while ((line = reader.readLine()) != null) {
+			stringBuilder.append(line);
+			stringBuilder.append(ls);
+		}
+		// delete the last new line separator
+		// Comprobar el archivo vacio
+		System.out.println(stringBuilder.length());
+		if (stringBuilder.length() - 1 <= 0) {
+			reader.close();
+			content = "[]";
+		} else {
+			stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+			reader.close();
+			content = stringBuilder.toString();
+
+		}
+		// convert to json array
+		JSONArray json = new JSONArray(content);
+		return json;
+	}
+
+	public void write(JSONArray json) {
+		try {
+			String test = json.toString();
+			File file = new File(ruta);
+
+			FileWriter fw = new FileWriter(file.getAbsoluteFile());
+			BufferedWriter bw = new BufferedWriter(fw);
+			bw.write(test);
+			bw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
 
 }
