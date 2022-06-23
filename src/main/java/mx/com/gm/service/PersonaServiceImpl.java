@@ -37,6 +37,8 @@ public class PersonaServiceImpl implements PersonaService {
 	public Persona guardar(Persona persona) throws IOException, JSONException {
 
 		String ruta = "\\Users\\Default.DESKTOP-SMFCBP8\\Desktop\\employees.json";
+		String content;
+		int id = -1;
 
 		// Leemos el archivo en un string
 		BufferedReader reader = new BufferedReader(new FileReader(ruta));
@@ -48,17 +50,30 @@ public class PersonaServiceImpl implements PersonaService {
 			stringBuilder.append(ls);
 		}
 		// delete the last new line separator
-		stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-		reader.close();
+		// Comprobar el archivo vacio
+		System.out.println(stringBuilder.length());
+		if (stringBuilder.length() - 1 <= 0) {
+			reader.close();
+			content = "[]";
+			id = -1;
+		} else {
+			stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+			reader.close();
+			content = stringBuilder.toString();
 
-		String content = stringBuilder.toString();
+		}
+
 		// convert to json array
 		JSONArray json = new JSONArray(content);
+		System.out.println(id);
+		if ((id < 0) && (stringBuilder.length() <= 0)) { // No hay ningun elemento en la lista iniciamos en cero
+			id = 0;
+		} else {
+			// Seteamos el ID para que sea autoincrementable
+			id = (int) (json.getJSONObject(json.length() - 1).opt("idPersona")) + 1; // Obteniendo el id del ultimo
+			persona.setIdPersona(id); // Se asigna Id
 
-		// Seteamos el ID para que sea autoincrementable
-		int id = (int) (json.getJSONObject(json.length() - 1).opt("idPersona")) + 1; // Obteniendo el id del ultimo
-																						// elemento con .opt
-		persona.setIdPersona(id); // Se asigna Id
+		}
 
 		// Pequeña transformacion de un objeto java a Gson y por ultimo a JSONObject
 		Gson gson = new Gson();
