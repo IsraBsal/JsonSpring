@@ -38,7 +38,7 @@ public class PersonaServiceImpl implements PersonaService {
 
 		String ruta = "\\Users\\Default.DESKTOP-SMFCBP8\\Desktop\\employees.json";
 		String content;
-		int id = -1;
+		int id = 0;
 
 		// Leemos el archivo en un string
 		BufferedReader reader = new BufferedReader(new FileReader(ruta));
@@ -55,7 +55,6 @@ public class PersonaServiceImpl implements PersonaService {
 		if (stringBuilder.length() - 1 <= 0) {
 			reader.close();
 			content = "[]";
-			id = -1;
 		} else {
 			stringBuilder.deleteCharAt(stringBuilder.length() - 1);
 			reader.close();
@@ -65,8 +64,7 @@ public class PersonaServiceImpl implements PersonaService {
 
 		// convert to json array
 		JSONArray json = new JSONArray(content);
-		System.out.println(id);
-		if ((id < 0) && (stringBuilder.length() <= 0)) { // No hay ningun elemento en la lista iniciamos en cero
+		if (json.length() == 0) { // No hay ningun elemento en la lista
 			id = 0;
 		} else {
 			// Seteamos el ID para que sea autoincrementable
@@ -104,6 +102,8 @@ public class PersonaServiceImpl implements PersonaService {
 	public Boolean eliminar(int idPersona) throws IOException, JSONException {
 		String ruta = "\\Users\\Default.DESKTOP-SMFCBP8\\Desktop\\employees.json";
 		Boolean bandera = false;
+		String content;
+
 		// Leemos el archivo en un string
 		BufferedReader reader = new BufferedReader(new FileReader(ruta));
 		StringBuilder stringBuilder = new StringBuilder();
@@ -114,10 +114,17 @@ public class PersonaServiceImpl implements PersonaService {
 			stringBuilder.append(ls);
 		}
 		// delete the last new line separator
-		stringBuilder.deleteCharAt(stringBuilder.length() - 1);
-		reader.close();
+		// Comprobar el archivo vacio
+		System.out.println(stringBuilder.length());
+		if (stringBuilder.length() - 1 <= 0) {
+			reader.close();
+			content = "[]";
+		} else {
+			stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+			reader.close();
+			content = stringBuilder.toString();
 
-		String content = stringBuilder.toString();
+		}
 		// convert to json array
 		JSONArray json = new JSONArray(content);
 
@@ -140,6 +147,7 @@ public class PersonaServiceImpl implements PersonaService {
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
+				return bandera;
 
 			} else {
 				bandera = false;
@@ -155,7 +163,7 @@ public class PersonaServiceImpl implements PersonaService {
 		// TODO Auto-generated method stub
 		String ruta = "\\Users\\Default.DESKTOP-SMFCBP8\\Desktop\\employees.json";
 		String content;
-		
+
 		// Leemos el archivo en un string
 		BufferedReader reader = new BufferedReader(new FileReader(ruta));
 		StringBuilder stringBuilder = new StringBuilder();
@@ -190,7 +198,7 @@ public class PersonaServiceImpl implements PersonaService {
 		String ruta = "\\Users\\Default.DESKTOP-SMFCBP8\\Desktop\\employees.json";
 		int posicion = -1;
 		String content;
-		
+
 		System.out.println("Objeto " + persona);
 		// Creamos el objeto persona de java para convertirlo a JSON
 		Persona personaJson = new Persona();
